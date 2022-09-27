@@ -10,7 +10,7 @@ class Product{
     }
 
     productImport(){
-        return parseFloat(this.price * this.units);
+        return this.price * this.units;
     }
 
     toString(){
