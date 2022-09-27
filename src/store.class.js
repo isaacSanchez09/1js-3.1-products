@@ -1,6 +1,7 @@
 'use strict'
 const Category = require('./category.class');
 const Product = require('./product.class');
+const Dades = require('./datosIni.json');
 
 class Store{
     constructor(id,name){
@@ -143,6 +144,18 @@ class Store{
         return `Almacen '${id}' => '${this.products.length}' productos: '${this.totalImport()}'
         <br>
         '${this.products}`
+    }
+
+    init(){
+        let categories = Dades.categories;
+        categories.forEach(category => {
+            this.categories.push(new Category(category.id,category.name, category.description))
+        });
+
+        let products = Dades.products;
+        products.forEach(product => {
+            this.products.push(new Product(product.id, product.name, product.category, product.price, product.units ))
+        });
     }
 
 }
