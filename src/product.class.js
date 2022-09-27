@@ -10,11 +10,11 @@ class Product{
     }
 
     productImport(){
-        return this.price * this.units;
+        return parseFloat(this.price * this.units);
     }
 
     toString(){
-        return this.name + ": " + this.units + " uds. x " + this.price + " €/u = " + this.productImport() + " €";
+        return this.name + ": " + this.units + " uds. x " + this.price + " €/u = " + this.productImport().toFixed(2) + " €";
     }
 }
 
