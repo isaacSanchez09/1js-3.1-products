@@ -1,7 +1,7 @@
 'use strict'
 const Category = require('./category.class');
 const Product = require('./product.class');
-const Dades = require('./datosIni.json');
+const Dades = require('../datosIni.json');
 
 class Store{
     constructor(id,name){
@@ -99,7 +99,7 @@ class Store{
 
     delCategory(id){
         let categoria = this.getCategoryById(id);
-        if(this.getProductsByCategory(id) == 0){
+        if(this.getProductsByCategory(id).length == 0){
             let posicion = this.categories.indexOf(categoria);
             this.categories.splice(posicion, 1);
         }else{
@@ -120,7 +120,7 @@ class Store{
     }
 
     totalImport(){
-        return this.products.reduce((price, product) => price += product.totalImport(),0);
+        return this.products.reduce((price, product) => price += product.productImport(),0);
     }
 
     orderByUnitsDesc(){
@@ -146,6 +146,8 @@ class Store{
         '${this.products}`
     }
 
+    
+
     init(){
         let categories = Dades.categories;
         categories.forEach(category => {
@@ -159,5 +161,6 @@ class Store{
     }
 
 }
+
 module.exports = Store
 
