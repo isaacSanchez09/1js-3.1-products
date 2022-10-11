@@ -38,11 +38,18 @@ class View{
 
     renderMessaje(mensajeEror){
         let error = document.getElementById('messages');
-        error.innerHTML =`
-        <div class="alert alert-danger alert-dismissible" role="alert">
+        let div = document.createElement('div');
+        div.classList = `alert alert-danger alert-dismissible`;
+        div.setAttribute('role','alert');
+        div.innerHTML +=`
         ${mensajeEror}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove()"></button>
-      </div>`
+        </div>`;
+        error.appendChild(div);
+
+        setTimeout(function(){
+            div.remove();
+        },5000);
     }
 
     initCategories(categories){
@@ -59,6 +66,7 @@ class View{
         opcionesCategorias.removeChild(option);
     }
 
+    
     setTotalImport(totalImport){
         let importe = document.getElementById('importeTotal');
         importe.textContent = totalImport;

@@ -44,7 +44,7 @@ class Controller{
             this.storeView.setTotalImport(this.myStore.totalImport());
         }catch(error){
             this.storeView.renderMessaje(error);
-
+            this.storeView.delError();
         }
     }
 
