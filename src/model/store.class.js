@@ -64,37 +64,12 @@ class Store{
     }
 
     addProduct(playload){
-            if(!playload.name){
-                throw "El nombre es requerido"
-            }
-            if(!playload.category){
-                throw "La categoria es requerida"
-            }
-            if(!playload.price){
-                throw "El precio es requerido"
-            }
-            if(playload.price < 0){
-                throw "El precio no puede ser menor que cero"
-            }
-            if(isNaN(playload.price)){
-                throw "El precio no puede ser menor que cero"
-            }
-            if(playload.units){
-                if(isNaN(playload.units)){
-                    throw "Las unidades no son validas"
-                }
-                if(playload.units < 0){
-                    throw "El precio ha de ser positivo"
-                }
-                if(!Number.isInteger(playload.units)){
-                    throw "El precio ha de ser entero"
-                }
-            }
+            this.comprobarDatos(playload);
             if(this.getCategoryById(playload.category)){
                 let producto = new Product (this.getNextId(this.products),playload.name,playload.category,playload.price,playload.units);
                 this.products.push(producto);
                 return producto;
-        }
+            }
     }
 
     delCategory(id){
@@ -110,12 +85,47 @@ class Store{
 
     delProduct(id){
         let producto = this.getProductById(id);
-        if(producto == 0 || producto.units > 0){
-            throw "No existen productos o contiene unidades"
-        }else{
-            let posicion = this.products.indexOf(producto);
-            this.products.splice(posicion, 1);
-            return producto;
+        let posicion = this.products.indexOf(producto);
+        this.products.splice(posicion, 1);
+        return producto;
+    }
+
+    editProduct(playload){
+        this.comprobarDatos(playload);
+        let product = this.getProductById(playload.id);
+        product.name = playload.name;
+        product.category = playload.category;
+        product.price = Number(playload.price);
+        product.units = playload.units;
+        return product;          
+    }
+
+    comprobarDatos(playload){
+        if(!playload.name){
+            throw "El nombre es requerido"
+        }
+        if(!playload.category){
+            throw "La categoria es requerida"
+        }
+        if(!playload.price){
+            throw "El precio es requerido"
+        }
+        if(playload.price < 0){
+            throw "El precio no puede ser menor que cero"
+        }
+        if(isNaN(playload.price)){
+            throw "El precio no puede ser menor que cero"
+        }
+        if(playload.units){
+            if(isNaN(playload.units)){
+                throw "Las unidades no son validas"
+            }
+            if(playload.units < 0){
+                throw "El precio ha de ser positivo"
+            }
+            if(!Number.isInteger(playload.units)){
+                throw "El precio ha de ser entero"
+            }
         }
     }
 
@@ -145,8 +155,6 @@ class Store{
         <br>
         '${this.products}`
     }
-
-    
 
     init(){
         let categories = Dades.categories;

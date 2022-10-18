@@ -18,12 +18,16 @@ window.addEventListener('load', () => {
     const price = document.getElementById('newprod-price').value
     const category = document.getElementById('categorias').value 
     const units = document.getElementById('newprod-units').value 
- 
+    const id = document.getElementById('newprod-id').value
     // ...
     
     // Aquí llamamos a la función del controlador que añade productos (addProductToStore)
     // pasándole como parámetro esos datos
-    myController.addProductToStore({ name: name, price: price, category: parseInt(category),units:parseInt(units) })   
+    if(id){
+      myController.editProduct({ id: parseInt(id), name: name, price: Number(price), category: parseInt(category), units: parseInt(units) })   
+    }else{
+      myController.addProductToStore({ name: name, price: Number(price), category: parseInt(category),units:parseInt(units) })   
+    }
     // Sintaxis de ES2015 que equivale a 
     //
     // myController.addProductToStore(
@@ -57,11 +61,12 @@ window.addEventListener('load', () => {
     // ) 
   })
 
-  document.getElementById('del-prod').addEventListener('submit', (event) => {
-    event.preventDefault()
+  // document.getElementById('del-prod').addEventListener('submit', (event) => {
+    //event.preventDefault()
 
-    myController.deleteProductFromStore(document.getElementById('delprod-id').value)      
-  })
+    //myController.deleteProductFromStore(document.getElementById('delprod-id').value)      
+  //})
+  
 
   document.getElementById('del-cat').addEventListener('submit', (event) => {
     event.preventDefault()

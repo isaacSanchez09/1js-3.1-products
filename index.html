@@ -8,35 +8,37 @@
 	<meta name="keywords" content="JavaScript, Ejercicio, HTML5, DAW">
 	<!-- CSS only -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="src/css/productos.css" rel="stylesheet">
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<div class="container-fluid">
-		  <span class="navbar-brand" href="#">Almacén ACME</span>
+		  <span class="navbar-brand " href="#">Almacén ACME</span>
 		  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 			<div class="navbar-nav">
-			  <a class="nav-link active" aria-current="page" href="#">Productos</a>
-			  <a class="nav-link" href="#">Categorías</a>
-			  <a class="nav-link" href="#">Añadir producto</a>
-			  <a class="nav-link" href="#">Añadir categoría</a>
-			  <a class="nav-link" href="#">Sobre nosotros</a>
+			  <a class="nav-link active" aria-current="page" href="#" id="prods-view">Productos</a>
+			  <a class="nav-link" href="#" id="cat-view">Categorías</a>
+			  <a class="nav-link" href="#" id="addProd-view">Añadir producto</a>
+			  <a class="nav-link" href="#" id="addCat-view">Añadir categoría</a>
+			  <a class="nav-link" href="#" id="info-view">Sobre nosotros</a>
 			</div>
 		  </div>
 		</div>
 	  </nav>
 
 	  <div class="container">
-        <header>
-            <h1>Listado de productos</h1>
-        </header>
-
+        
         <!-- Zona para mostrar mensajes al usuario -->
         <div class="row" id="messages">
 			  
 		</div>
         <!-- Almacén de productos -->
-        <div class="row">
+        <div class="row" id="prodList">
+			<header>
+				<h1>Listado de productos</h1>
+			</header>
             <div class="col-sm-12 col-md-12 col-lg-12" id="almacen">
                 <table class="table table-striped table-hover table-responsive">
                     <thead class="bg-dark">
@@ -50,9 +52,9 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="listaProductos">
+                    <tbody id="listaProductos" class="text-center">
                     </tbody>
-                    <tfoot>
+                    <tfoot class="text-center">
                         <th colspan="5">Importe total del almacén:</th>
                         <th id="importeTotal"></th>
                         <th></th>
@@ -61,17 +63,41 @@
             </div>
         </div>
 
+		<div class="row oculto" id="catList">
+			<header>
+				<h1>Listado de categorias</h1>
+			</header>
+            <div class="col-sm-12 col-md-12 col-lg-12" id="almacen">
+                <table class="table table-striped table-hover table-responsive">
+                    <thead class="bg-dark">
+                        <tr class="text-white text-center">
+                            <th>Id</th>
+                            <th>Nombre</th>
+                            <th>Descripcion</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaCategorias" class="text-center">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
 
 		        <!-- Acciones sobre el almacén -->
-				<div class="row">
+				<div class="row" >
 					<div class="col-sm-6 col-md-4 col-lg-4">
-						<form id="new-prod">
+						<form id="new-prod" class="oculto">
+							<header>
+								<h1 id="headForm">Añadir producto</h1>
+							</header>
 							<fieldset>
-								<legend class="bg-dark text-white text-center">Añadir producto</legend>
+								<legend class="bg-dark text-white text-center" id="tituloForm">Añadir producto</legend>
 								<!-- Aquí los inputs y botones del form -->
+								<input type="text" id="action" value="add" hidden>
 								<div class="form-group">
 									<label for="newprod-id">ID:</label>
-									<input type="text" class="form-control" disabled>
+									<input type="text" id="newprod-id" class="form-control" disabled>
 								</div>
 								<div class="form-group">
 									<label for="newprod-name">Nombre:</label>
@@ -90,16 +116,19 @@
 								</div>
 								<div class="form-group">
 									<label for="newprod-price">Precio/u.:</label>
-									<input type="number" id="newprod-price" class="form-control">
+									<input type="text" id="newprod-price" class="form-control">
 								</div>
 								<br>
-								<button type="submit" class="btn btn-default btn-dark">Añadir</button>
+								<button type="submit" class="btn btn-default btn-dark" id="botonFormulario">Añadir</button>
 								<button type="reset" class="btn btn-danger">Reset</button>
 							</fieldset>
 						</form>
 					</div>
 					<div class="col-sm-6 col-md-4 col-lg-4">
-						<form id="new-cat">
+						<form id="new-cat" class="oculto">
+							<header>
+								<h1>Añadir Categoria</h1>
+							</header>
 							<fieldset>
 								<legend class="bg-dark text-white text-center">Añadir categoría</legend>
 								<!-- Aquí los inputs y botones del form -->
@@ -122,21 +151,7 @@
 						</form>
 					</div>
 					<div class="col-sm-6 col-md-4 col-lg-4">
-						<form id="del-prod">
-							<fieldset>
-								<legend class="bg-dark text-white text-center">Eliminar producto</legend>
-								<!-- Aquí los inputs y botones del form -->
-								<div class="form-group">
-									<label for="delprod-id">ID:</label>
-									<input type="text" id="delprod-id" class="form-control">
-								</div>
-								<br>
-								<button type="submit" class="btn btn-default btn-dark">Añadir</button>
-								<button type="reset" class="btn btn-danger">Reset</button>
-							</fieldset>
-						</form>
-						<br>
-						<form id="del-cat">
+							<form id="del-cat" class="oculto">
 							<fieldset>
 								<legend class="bg-dark text-white text-center">Eliminar categoría</legend>
 								<!-- Aquí los inputs y botones del form -->
@@ -153,7 +168,7 @@
 				</div>
 		
 		
-	<footer><small>Diseño Web en Entorno Cliente - Juan Segura</small></footer>
+	<footer><small>Diseño Web en Entorno Cliente - Isaac Sánchez</small></footer>
     <script src="./dist/main.js"></script>
 </body>
 </html>

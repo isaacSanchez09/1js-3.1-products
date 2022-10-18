@@ -16,6 +16,17 @@ class Product{
     toString(){
         return this.name + ": " + this.units + " uds. x " + this.price + " €/u = " + this.productImport().toFixed(2) + " €";
     }
+
+    addUnits(){
+        this.units++;
+    }
+
+    delUnits(){
+        if(this.units === 0){
+            throw "Las unidades no pueden ser menor que 0";
+        }
+        this.units--;
+    }
 }
 
 
