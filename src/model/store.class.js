@@ -11,6 +11,10 @@ class Store{
         this.categories = [];
     }
 
+    productNameExist(name, id){
+        return this.products.some((product) => product.name == name && product.id != id);
+    }
+
     getCategoryById(id){
         let categoria = this.categories.find(category => category.id === id);
         if(categoria === undefined){
