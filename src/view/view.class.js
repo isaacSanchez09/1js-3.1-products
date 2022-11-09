@@ -9,8 +9,8 @@ const catList = document.getElementById('catList');
 
 class View{
     
-    init(categories, products, callback1, callback2, callback3){
-        this.initCategories(categories);
+    init(categories, products, callback1, callback2, callback3, callback4){
+        this.initCategories(categories, callback4);
         this.initProducts(products, callback1, callback2, callback3);
     }
 
@@ -32,19 +32,20 @@ class View{
         productos.removeChild(document.getElementById(`producto${id}`))
     }
 
-    initCategories(categories){
+    initCategories(categories, callback4){
         const opcionesCategorias = document.getElementById('categorias');
         categories.forEach(category =>{
             let newOption = this.appendCategory(category);
             opcionesCategorias.appendChild(newOption);
-            this.appendCategoryList(category);
+            this.appendCategoryList(category, callback4);
         })
     }
 
-    deleteCategory(categories){
+    deleteCategory(category){
         const opcionesCategorias = document.getElementById('categorias');
-        let option = document.getElementById(`category${categories.id}`);
-        opcionesCategorias.removeChild(option);
+        let listadoCategorias = document.getElementById('listaCategorias');
+        listadoCategorias.removeChild(document.getElementById(`categoria${category}`));
+        opcionesCategorias.removeChild(document.getElementById(`category${category}`));
     }
 
     
@@ -79,7 +80,7 @@ class View{
         document.getElementById('tituloForm').textContent = "Añadir Producto";
     }
 
-    appendCategoryList(category){
+    appendCategoryList(category, callback4){
         let listadoCategorias = document.getElementById('listaCategorias');
         let nuevaCategoria = document.createElement('tr');
         nuevaCategoria.id = `categoria${category.id}`;
@@ -87,9 +88,14 @@ class View{
             <td>${category.id}</td>
             <td>${category.name}</td>
             <td>${category.description}</td>
-            <td></td>`;
+            <td>
+            <button class="btn btn-danger" id="eliminarCategoria${category.id}"><span class="material-icons">delete</span></button></td>`;
         listadoCategorias.appendChild(nuevaCategoria);
+        document.getElementById(`eliminarCategoria${category.id}`).addEventListener('click', () => {
+            callback4(category.id);
+        })
     }
+
 
     initProducts(products, callback1, callback2, callback3){
         const listaProductos = document.getElementById('listaProductos')
@@ -116,7 +122,7 @@ class View{
             <td>${product.category}</td>
             <td id="units${product.id}">${product.units}</td>
             <td id="price${product.id}">${product.price} €/u</td>
-            <td id="import${product.id}">${product.productImport()}€</td>
+            <td id="import${product.id}">${product.productImport().toFixed(2)}€</td>
             <td>
                 <button class="btn" id="subirUnidades${product.id}"><span class="material-icons">add</span></button>
                 <button class="btn btn-danger" id="eliminarProducto${product.id}"><span class="material-icons">delete</span></button>

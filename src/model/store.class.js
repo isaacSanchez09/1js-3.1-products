@@ -1,7 +1,7 @@
 'use strict'
 const Category = require('./category.class');
 const Product = require('./product.class');
-const Dades = require('../datosIni.json');
+const SERVER = 'http://localhost:3000';
 
 class Store{
     constructor(id,name){
@@ -49,58 +49,102 @@ class Store{
 
     
 
-    addCategory(name, description){
+    async addCategory(name, description){
         if(!name){
             throw "No has introducido nombre";
         }
-        try{
-            this.getCategoryByName(name)
-        }catch(error){
+        try {
+            this.getCategoryByName(name);
+        } catch (error) {
             let categoriaNueva = new Category (
                 this.categories.reduce((max, category) => (max > category.id) ? max : category.id, 0) + 1,
                 name,
                 description
             );
+            let response = await fetch((SERVER + "/categories"), {
+                method: 'POST', 
+                body: JSON.stringify(categoriaNueva),
+                headers:{
+                'Content-Type': 'application/json'
+            }})
+            if (!response.ok) {
+                throw `Error ${response.status} de la BBDD: ${response.statusText}`
+            }
             this.categories.push(categoriaNueva);
             return categoriaNueva;
         }
-        throw "Ya exisiste una categoria con este nombre"
+        throw "Esta categoria ya existe";
     }
 
-    addProduct(playload){
-            this.comprobarDatos(playload);
-            if(this.getCategoryById(playload.category)){
-                let producto = new Product (this.getNextId(this.products),playload.name,playload.category,playload.price,playload.units);
-                this.products.push(producto);
-                return producto;
+    async addProduct(playload){
+        this.comprobarDatos(playload);
+        if(this.getCategoryById(playload.category)){
+            let producto = new Product (this.getNextId(this.products),playload.name,playload.category,playload.price,playload.units);
+            let response = await fetch((SERVER + "/products"), {
+                method: 'POST', 
+                body: JSON.stringify(producto),
+                headers:{
+                'Content-Type': 'application/json'
+                }
+            })
+            if (!response.ok) {
+                throw `Error ${response.status} de la BBDD: ${response.statusText}`
             }
-    }
-
-    delCategory(id){
-        let categoria = this.getCategoryById(id);
-        if(this.getProductsByCategory(id).length == 0){
-            let posicion = this.categories.indexOf(categoria);
-            this.categories.splice(posicion, 1);
-        }else{
-            throw "La categoria no esta vacia"
+            this.products.push(producto);  
+            return producto; 
         }
-        return categoria;
     }
 
-    delProduct(id){
-        let producto = this.getProductById(id);
-        let posicion = this.products.indexOf(producto);
-        this.products.splice(posicion, 1);
-        return producto;
+    async delCategory(id){
+        try {
+            let categoria = this.getCategoryById(id);
+            let posicion = this.categories.indexOf(categoria);
+            let response = await fetch(SERVER + "/categories/" + id, {
+                method: 'DELETE',
+                })
+            if(!response.ok){
+            throw ('Error en la petición HTTP: '+response.status+' ('+response.statusText+')');
+            }
+            this.categories.splice(posicion, 1);
+            return categoria;
+        } catch (error) {
+            throw error;
+        }
     }
 
-    editProduct(playload){
+    async delProduct(id){
+        try {
+            let producto = this.getProductById(id);
+            let posicion = this.products.indexOf(producto);
+            let response = await fetch(SERVER + "/products/" + id, {
+                method: 'DELETE',
+                })
+            if(!response.ok){
+                throw ('Error en la petición HTTP: '+response.status+' ('+response.statusText+')');
+            }
+            this.products.splice(posicion, 1);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async editProduct(playload){
         this.comprobarDatos(playload);
         let product = this.getProductById(playload.id);
         product.name = playload.name;
         product.category = playload.category;
         product.price = Number(playload.price);
         product.units = playload.units;
+        let response = await fetch(SERVER + "/products/" + playload.id, {
+            method: 'PUT',
+                body: JSON.stringify(product),
+                headers:{
+                'Content-Type': 'application/json'
+                }
+            })
+        if(!response.ok){
+            throw ('Error en la petición HTTP: '+response.status+' ('+response.statusText+')');
+        }
         return product;          
     }
 
@@ -160,18 +204,29 @@ class Store{
         '${this.products}`
     }
 
-    init(){
-        let categories = Dades.categories;
-        categories.forEach(category => {
-            this.categories.push(new Category(category.id,category.name, category.description))
-        });
+    async init(){
+        try {
+            const responseCat = await fetch(SERVER + "/categories");
+            if(!responseCat.ok){
+                throw 'Error en la petición HTTP: '+responseCat.status+' ('+responseCat.statusText+')';
+            }
+            const categories = await responseCat.json();
+            categories.forEach(category => {
+                this.categories.push(new Category(category.id,category.name, category.description))
+            });
 
-        let products = Dades.products;
-        products.forEach(product => {
-            this.products.push(new Product(product.id, product.name, product.category, product.price, product.units ))
-        });
+            const responseProd = await fetch(SERVER + "/products");
+            if(!responseProd.ok){
+                throw 'Error en la petición HTTP: '+responseProd.status+' ('+responseProd.statusText+')';
+            }
+            const products = await responseProd.json();
+            products.forEach(product => {
+                this.products.push(new Product(product.id, product.name, product.category, product.price, product.units ))
+            });
+        } catch (error) {
+            alert(error);
+        } 
     }
-
 }
 
 module.exports = Store

@@ -13,19 +13,19 @@ class Controller{
         this.storeView = new View();
     }
 
-    init(){
+    async init(){
         this.initEsacuchadores();
-        this.myStore.init();
-        this.storeView.init(this.myStore.categories, this.myStore.products, this.deleteProductFromStore.bind(this), this.addUnits.bind(this), this.delUnits.bind(this), this.addProductToStore.bind(this));
+        await this.myStore.init();
+        this.storeView.init(this.myStore.categories, this.myStore.products, this.deleteProductFromStore.bind(this), this.addUnits.bind(this), this.delUnits.bind(this), this.deleteCategoryFromStore.bind(this));
         this.storeView.setTotalImport(this.myStore.totalImport());
         this.storeView.initMenu();
     }
 
 
-    addProductToStore(product){
+    async addProductToStore(product){
         try{
             if(document.getElementById('new-prod').checkValidity()){
-                let newProduct = this.myStore.addProduct(product);
+                let newProduct = await this.myStore.addProduct(product);
                 this.storeView.renderProduct(newProduct, this.deleteProductFromStore.bind(this), this.addUnits.bind(this), this.addProductToStore.bind(this));
                 formProduct.reset();
             }
@@ -34,10 +34,10 @@ class Controller{
         }
     }
 
-    editProduct(product){
+    async editProduct(product){
         try{
             if(document.getElementById('new-prod').checkValidity()){
-                let newProd = this.myStore.editProduct(product);
+                let newProd = await this.myStore.editProduct(product);
                 this.storeView.editProduct(newProd);
                 this.storeView.setTotalImport(this.myStore.totalImport());
                 formProduct.reset();
@@ -47,21 +47,21 @@ class Controller{
         }
     }
 
-    addCategoryToStore(category){
+    async addCategoryToStore(category){
         try{
             if(category.description === ""){
                 category.description = undefined;
             }
-            let newCategory = this.myStore.addCategory(category.name, category.description);
+            let newCategory = await this.myStore.addCategory(category.name, category.description);
             this.storeView.renderCategory(newCategory);
-            this.storeView.appendCategoryList(newCategory);
+            this.storeView.appendCategoryList(newCategory, this.deleteCategoryFromStore.bind(this));
             formCategory.reset();
         }catch(error){
             this.storeView.renderMessaje(error);
         }
     }
 
-    deleteProductFromStore(id){
+    async deleteProductFromStore(id){
         const product = this.myStore.getProductById(Number(id));
         if (!product) {
             this.storeView.renderErrorMessage('No hay ningún producto con id ' + id);
@@ -73,32 +73,53 @@ class Controller{
                     return;
                 }
             }
-            const prodDeleted = this.myStore.delProduct(Number(id));
-            this.storeView.deleteProduct(id);
-            this.storeView.setTotalImport(this.myStore.totalImport());
+            try {
+                await this.myStore.delProduct(Number(id));
+                this.storeView.deleteProduct(id);
+                this.storeView.setTotalImport(this.myStore.totalImport());
+            } catch (error) {
+                this.storeView.renderMessaje(error);
+            }
         }
     }
 
-    deleteCategoryFromStore(id){
+    async deleteCategoryFromStore(id){
+        let categoria = this.myStore.getCategoryById(id);
+        if (!categoria) {
+            this.storeView.renderErrorMessage('No hay ningúna categoria con id ' + id);
+            return;
+        }
         try{
-            let category = this.myStore.delCategory(parseInt(id));
-            this.storeView.deleteCategory(category);
+            if (confirm(`Deseas borrar la categoria "${categoria.name}" con id ${categoria.id}?`)) {
+                let categoryProds = this.myStore.getProductsByCategory(id);
+                if (!categoryProds.length == 0) {
+                    throw "Esta categoria no se puede borrar porque tiene productos";
+                }
+                try {
+                    await this.myStore.delCategory(id);
+                    this.storeView.deleteCategory(id, this.deleteCategoryFromStore.bind(this));
+                } catch (error) {
+                    this.storeView.renderMessaje(error);
+                }
+            }
         }catch(error){
             this.storeView.renderMessaje(error);
         }
     }
     
-    addUnits(id){
+    async addUnits(id){
         let producto = this.myStore.getProductById(id);
         producto.addUnits();
+        producto = await this.myStore.editProduct(producto);
         this.storeView.editProduct(producto);
         this.storeView.setTotalImport(this.myStore.totalImport());
     }
 
-    delUnits(id){
+    async delUnits(id){
         let producto = this.myStore.getProductById(id);
         try{
             producto.delUnits();
+            producto = await this.myStore.editProduct(producto);
             this.storeView.editProduct(producto);
             this.storeView.setTotalImport(this.myStore.totalImport());
         }catch(error){
@@ -162,7 +183,6 @@ class Controller{
               const nameCategory = document.getElementById('newcategory-name').value
               const description = document.getElementById('newcategory-description').value
               this.addCategoryToStore({ name: nameCategory, description: description})   
-              
             })
           
             document.getElementById('del-cat').addEventListener('submit', (event) => {
